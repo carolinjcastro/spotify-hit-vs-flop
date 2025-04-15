@@ -38,7 +38,11 @@ This app was developed locally and is currently view-only. A hosted public versi
 ## File Structure
 SpotifyDashApp/
 ├── app.py                  # Main Dash application code
+
 ├── Spotify_dataset.csv     # Raw dataset used for training and visualization
+
 ├── assets/                 # (Optional) Add custom stylesheets or images here
+
 ├── README.md               # Project overview and documentation (this file)
+
 Note: The dataset is loaded as-is and cleaned within the app.py script. You don’t need to modify the CSV beforehand.

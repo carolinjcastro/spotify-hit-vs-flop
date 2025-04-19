@@ -6,12 +6,12 @@ import plotly.io as pio
 import plotly.graph_objects as go
 import statsmodels.api as sm
 
-# Setting default Plotly theme to avoid bugs
+# Setting default Plotly theme
 pio.templates.default = "plotly_white"
 
 
 # Loading the data
-spotify_data = pd.read_csv('/Users/carolincastro/Documents/Project Folder/SpotifyDashApp/Spotify_dataset.csv')
+spotify_data = pd.read_csv('Spotify_dataset.csv')
 
 # Data Cleaning
 spotify_data.drop(['Unnamed: 0', 'genres'], axis=1, inplace=True)
@@ -20,21 +20,23 @@ spotify_data.drop_duplicates(subset=['uri'], inplace=True)
 # Defining columns of interest for analysis
 columns_of_interest = ['danceability', 'energy', 'valence', 'instrumentalness', 'speechiness']
 
+
 # Logistic regression setup
 X =  sm.add_constant(spotify_data[columns_of_interest])
 y = spotify_data['target']
 model = sm.Logit(y,X).fit(disp=False)
-coefs = model.params
-conf = model.bse * 1.96
+coefs = model.params  # Extracting model coefficients
+conf = model.bse * 1.96 # Computing 95% confidence intervals
 
-# Starting Dash app
+# Initializing the Dash app
 app = dash.Dash(__name__)
 app.title = "Spotify Hit Predictor"
 
-# Layout of the app
+# Structuring the layout with Markdown, dropdown, and multiple graphs
 app.layout = html.Div([
     html.H1("Spotify Hit vs Flop Explorer", style={"textAlign": "center"}),
 
+    # Intro text describing the app
     dcc.Markdown("""
     **Welcome to the Spotify Hit vs Flop Explorer**
 
@@ -42,6 +44,7 @@ app.layout = html.Div([
     Explore how musical features like *danceability*, *energy*, and *valence* relate to a track’s success, based on data from Spotify’s Web API and Billboard charts.
     """, style={"backgroundColor": "#fff8f5", "padding": "20px", "borderRadius": "12px"}),
 
+    # Dropdown menu to explore individual features
     html.Label("Explore how each feature is distributed across hits and flops:"),
     dcc.Dropdown(
         id='feature-dropdown',
@@ -54,6 +57,7 @@ app.layout = html.Div([
 
     html.H2("Feature Correlation with Hit Likelihood", style={"marginTop": "40px"}),
 
+     # Explaining correlation logic
     dcc.Markdown("""
     These values reflect how each feature correlates with a track being a hit.
 
@@ -125,6 +129,7 @@ app.layout = html.Div([
 
 
 # Callback to update histogram
+# Creating a grouped histogram that compares the selected audio feature across hit and flop tracks
 @app.callback(
     Output('histogram', 'figure'),
     Input('feature-dropdown', 'value')
@@ -163,6 +168,7 @@ def update_histogram(selected_feature):
     return fig
 
 # Callback to update correlation bar
+# Calculating and displaying the correlation of each feature with the target (hit vs flop)
 @app.callback(
     Output('correlation-bar', 'figure'),
     Input('feature-dropdown', 'value')  
@@ -207,6 +213,8 @@ def update_correlation(selected_feature):
     )
     return fig
 
+# Callback to update regression-bar
+
 @app.callback(Output('regression-bar', 'figure'), Input('feature-dropdown', 'value'))
 def update_regression(_):
     fig = go.Figure()
@@ -227,6 +235,7 @@ def update_regression(_):
     )
     return fig
 
+# Callback to update jitter plot
 @app.callback(
     Output('jitter-plot', 'figure'), 
     Input('feature-dropdown','value'),
@@ -248,13 +257,12 @@ def update_jitter(selected_feature, n_clicks, artist_name, track_name):
         title=f"Jitter Plot of {selected_feature.capitalize()} by Track Type"
     )
 
-    # Only highlighting if there's a valid song selected
+    # Adding a marker for the selected song, if valid input is provided
     if n_clicks > 0 and artist_name and track_name:
         track = spotify_data[
             (spotify_data['artist'].str.lower() == artist_name.strip().lower()) &
             (spotify_data['track'].str.lower() == track_name.strip().lower())
-            ]
-        # Only adding star if the song was found and has a valid feature value
+        ]
         if not track.empty and not pd.isna(track[selected_feature].iloc[0]):
             fig.add_trace(
                 go.Scatter(
@@ -285,6 +293,7 @@ def update_jitter(selected_feature, n_clicks, artist_name, track_name):
     )
     return fig
 
+# Callback to update prediction-output
 @app.callback(
     Output('prediction-output', 'children'),
     Input('predict-button', 'n_clicks'),
@@ -314,6 +323,7 @@ def predict_hit(n_clicks, artist_name, track_name):
         html.P(f"Probability of being a hit: {probability: .2%}")
     ])
 
+# Callback to update scatter song placement
 @app.callback(
     Output('scatter-song-placement', 'figure'),
     Input('predict-button', 'n_clicks'),

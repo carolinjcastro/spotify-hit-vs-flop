@@ -45,4 +45,4 @@ SpotifyDashApp/
 
 ├── README.md               # Project overview and documentation (this file)
 
-Note: The dataset is loaded as-is and cleaned within the app.py script. You don’t need to modify the CSV beforehand.
+Note: The dataset is loaded as-is and cleaned within the app.py script.

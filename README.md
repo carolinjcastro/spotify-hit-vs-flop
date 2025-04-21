@@ -14,7 +14,7 @@ Using the dashboard, users can:
 
 You’ll see your song highlighted with a ★ purple star.
 
-![](assets/demo.mp4)
+<video src="assets/demo.mp4">
 
 ---
 

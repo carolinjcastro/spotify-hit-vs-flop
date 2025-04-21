@@ -42,6 +42,6 @@ SpotifyDashApp/
 
 ├── assets/                 # (Optional) Add custom stylesheets or images here
 
-├── README.md               # Project overview and documentation (this file)
+├── README.md               # Project overview and documentation
 
 Note: The dataset is loaded as-is and cleaned within the app.py script.

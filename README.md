@@ -15,7 +15,6 @@ Using the dashboard, users can:
 You’ll see your song highlighted with a ★ purple star.
 
 A walkthrough video of the working app is linked below:  
-[Demo Video](#) *(link will go here once uploaded)*
 
 ---
 

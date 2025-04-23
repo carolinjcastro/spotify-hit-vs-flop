@@ -1,3 +1,12 @@
+"""
+Spotify Hit vs Flop Explorer
+
+An interactive Dash app that visualizes the likelihood of a song becoming a hit based on selected audio features.
+Users can explore feature distributions, model predictions, and positional trends using logistic regression and multiple interactive plots.
+
+Created: April 2025
+Author: Julie Castro Pena
+"""
 import dash
 from dash import html, dcc, Input, Output
 import pandas as pd
@@ -135,6 +144,7 @@ app.layout = html.Div([
     Input('feature-dropdown', 'value')
 )
 def update_histogram(selected_feature):
+    """Updating histogram comparing selected feature between hits and flops."""
     fig = px.histogram(
         spotify_data,
         x=selected_feature,
@@ -174,6 +184,7 @@ def update_histogram(selected_feature):
     Input('feature-dropdown', 'value')  
 )
 def update_correlation(selected_feature):
+    """Display correlation between each feature and hit likelihood."""
     features = ['danceability', 'energy', 'valence', 'instrumentalness', 'speechiness']
     corr = spotify_data[columns_of_interest + ['target']].dropna().corr()['target'].drop('target')
 
@@ -217,6 +228,7 @@ def update_correlation(selected_feature):
 
 @app.callback(Output('regression-bar', 'figure'), Input('feature-dropdown', 'value'))
 def update_regression(_):
+    """Show logistic regression coefficients with confidence intervals."""
     fig = go.Figure()
     fig. add_trace(go.Bar(
         x=coefs.index,
@@ -245,6 +257,7 @@ def update_regression(_):
 )
 
 def update_jitter(selected_feature, n_clicks, artist_name, track_name):
+    """Render jitter plot and highlight a selected song if found."""
     # Base jitter plot of all songs
     fig = px.strip(
         spotify_data,
@@ -301,6 +314,7 @@ def update_jitter(selected_feature, n_clicks, artist_name, track_name):
     Input('track-input', 'value')
     )
 def predict_hit(n_clicks, artist_name, track_name):
+     """Return hit/flop prediction and probability for the input song."""
     if n_clicks == 0 or not artist_name or not track_name:
         return ""
     
@@ -331,10 +345,11 @@ def predict_hit(n_clicks, artist_name, track_name):
     Input('track-input', 'value')
 )
 def update_song_scatter(n_clicks, artist_name, track_name):
+    """Display selected song's position on Danceability vs Energy plot."""
     # Base figure using graph_objects for full control
     fig = go.Figure()
 
-    # Add scatter points for all songs by target group
+    # Adding scatter points for all songs by target group
     for target_value, color in zip([0, 1], ['#F7A8A4', '#A8E6CF']):
         filtered = spotify_data[spotify_data['target'] == target_value]
         fig.add_trace(go.Scatter(
@@ -347,7 +362,7 @@ def update_song_scatter(n_clicks, artist_name, track_name):
             hoverinfo='skip'
         ))
 
-    # Add highlighted selected song, if found
+    # Adding highlighted selected song, if found
     if n_clicks > 0 and artist_name and track_name:
         track = spotify_data[
             (spotify_data['artist'].str.lower() == artist_name.strip().lower()) &
@@ -385,6 +400,6 @@ def update_song_scatter(n_clicks, artist_name, track_name):
 
 
 
-# Run the app
+# Running the app
 if __name__ == '__main__':
     app.run(debug=True)
